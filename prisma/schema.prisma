@@ -18,35 +18,71 @@ enum genders {
   FEMALE
 }
 
-model users {
-  id Int @id @default(autoincrement())
+enum user_status {
+  RED
+  GREEN
+  YELLOW
+  WHITE
+}
 
+model admins {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  email               String                @unique
+  password            String
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  personal_tokens     personal_tokens[]
+  verification_tokens verification_tokens[]
+}
+
+model personal_tokens {
+  id            Int      @id @default(autoincrement())
+  admin_id      Int
+  user_device   String?
+  refresh_token String
+  expires_at    Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  admins admins @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+
+  @@index([refresh_token], type: Hash)
+}
+
+model verification_tokens {
+  id          Int        @id @default(autoincrement())
+  admin_id    Int
+  code        Int
+  token       String
+  verify_type VerifyType
+  expires_at  DateTime
+  created_at  DateTime   @default(now())
+
+  admins admins @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+
+  @@index([code], type: Hash)
+  @@index([token], type: Hash)
+}
+
+model users {
+  id            Int          @id @default(autoincrement())
   name          String
   nid           String
   father        String
   mother        String
   occupation    String
   date_of_birth String
+  mobile_no     String
   upozilla_id   Int
   union_id      Int
   village_id    Int
   gender        genders
-
-  updated_at DateTime?  @updatedAt
-  address    addresses?
+  status        user_status?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime?    @updatedAt
 
   @@index([gender], type: Hash)
-}
-
-model addresses {
-  id       Int    @id @default(autoincrement())
-  user_id  Int    @unique
-  upozilla String
-  union    String
-  village  String
-  house    String
-  mobile   String
-  users    users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model upozillas {

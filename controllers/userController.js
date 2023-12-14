@@ -56,12 +56,13 @@ const getUsers = asyncHandler(async (req, res, next) => {
   const selectedQueries = selectQueries(req.query, paginateWithAreaFields)
   const { page, take, skip, orderBy } = paginateWithSorting(selectedQueries)
 
-  let { upozilla_id, union_id, village_id, gender } = selectedQueries
+  let { upozilla_id, union_id, village_id, gender, status } = selectedQueries
 
   upozilla_id = upozilla_id ? Number(upozilla_id) : null
   union_id = union_id ? Number(union_id) : null
   village_id = village_id ? Number(village_id) : null
   gender = gender ? gender.toUpperCase() : null
+  status = status ? status.toUpperCase() : null
 
   let filterQuery = {}
 
@@ -81,7 +82,11 @@ const getUsers = asyncHandler(async (req, res, next) => {
   const [users, total] = await prisma.$transaction([
     prisma.users.findMany({
       where: {
-        AND: [filterQuery ? { ...filterQuery } : {}, gender ? { gender } : {}],
+        AND: [
+          filterQuery ? { ...filterQuery } : {},
+          gender ? { gender } : {},
+          status ? { status } : {},
+        ],
       },
       take,
       skip,
@@ -89,7 +94,11 @@ const getUsers = asyncHandler(async (req, res, next) => {
     }),
     prisma.users.count({
       where: {
-        AND: [filterQuery ? { ...filterQuery } : {}, gender ? { gender } : {}],
+        AND: [
+          filterQuery ? { ...filterQuery } : {},
+          gender ? { gender } : {},
+          status ? { status } : {},
+        ],
       },
     }),
   ])

@@ -9,6 +9,7 @@ const {
   urlNotFoundError,
   globalError,
 } = require('./middlewares/errorMiddleware')
+const deviceInfoMiddleware = require('./middlewares/deviceInfoMiddleware')
 
 // Uncaught Exception Handler
 process.on('uncaughtException', (error) => {
@@ -40,6 +41,7 @@ app.set('trust proxy', 1)
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(deviceInfoMiddleware)
 
 // Routes
 app.use('/api', router)

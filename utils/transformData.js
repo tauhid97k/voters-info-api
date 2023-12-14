@@ -20,6 +20,7 @@ const paginateWithAreaFields = [
   'union_id',
   'village_id',
   'gender',
+  'status',
 ]
 
 const paginateWithSorting = (options) => {

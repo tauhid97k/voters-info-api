@@ -1,7 +1,22 @@
 const prisma = require('../utils/prisma')
 const asyncHandler = require('express-async-handler')
 const { selectQueries } = require('../utils/transformData')
-const { unions, villages } = require('../data/data')
+const { upozillas, unions, villages } = require('../data/data')
+
+/*
+  @route    POST: /areas/upozillas
+  @access   public
+  @desc     Create Upozillas
+*/
+const createUpozillas = asyncHandler(async (req, res, next) => {
+  await prisma.upozillas.createMany({
+    data: upozillas,
+  })
+
+  res.status(201).json({
+    message: 'Upozillas are created successfully',
+  })
+})
 
 /*
   @route    POST: /areas/unions
@@ -62,6 +77,7 @@ const getAreas = asyncHandler(async (req, res, next) => {
 
 module.exports = {
   getAreas,
+  createUpozillas,
   createUnions,
   createVillages,
 }
