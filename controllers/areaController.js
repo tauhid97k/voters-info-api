@@ -60,4 +60,8 @@ const getAreas = asyncHandler(async (req, res, next) => {
   res.json(areas)
 })
 
-module.exports = { getAreas, createUnions, createVillages }
+module.exports = {
+  getAreas,
+  createUnions,
+  createVillages,
+}

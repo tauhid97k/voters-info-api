@@ -19,19 +19,21 @@ enum genders {
 }
 
 model users {
-  id          Int        @id @default(autoincrement())
-  upozilla_id Int
-  village_id  Int
-  union_id    Int
-  name        String
-  nid         Int
-  father      String
-  mother      String
-  occupation  String
-  gender      genders
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-  address     addresses?
+  id Int @id @default(autoincrement())
+
+  name          String
+  nid           String
+  father        String
+  mother        String
+  occupation    String
+  date_of_birth String
+  upozilla_id   Int
+  union_id      Int
+  village_id    Int
+  gender        genders
+
+  updated_at DateTime?  @updatedAt
+  address    addresses?
 
   @@index([gender], type: Hash)
 }
