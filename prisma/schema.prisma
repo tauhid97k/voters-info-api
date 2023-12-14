@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum VerifyType {
+  EMAIL
+  PASSWORD_RESET
+}
+
+enum genders {
+  MALE
+  FEMALE
+}
+
+model users {
+  id          Int        @id @default(autoincrement())
+  upozilla_id Int
+  village_id  Int
+  union_id    Int
+  name        String
+  nid         Int
+  father      String
+  mother      String
+  occupation  String
+  gender      genders
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  address     addresses?
+
+  @@index([gender], type: Hash)
+}
+
+model addresses {
+  id       Int    @id @default(autoincrement())
+  user_id  Int    @unique
+  upozilla String
+  union    String
+  village  String
+  house    String
+  mobile   String
+  users    users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model upozillas {
+  id     Int      @id @default(autoincrement())
+  name   String
+  unions unions[]
+}
+
+model unions {
+  id          Int    @id @default(autoincrement())
+  upozilla_id Int
+  name        String
+
+  upozillas upozillas  @relation(fields: [upozilla_id], references: [id], onDelete: Cascade)
+  villages  villages[]
+
+  @@index([upozilla_id], type: Hash)
+}
+
+model villages {
+  id       Int    @id @default(autoincrement())
+  union_id Int
+  name     String
+
+  unions unions @relation(fields: [union_id], references: [id], onDelete: Cascade)
+
+  @@index([union_id], type: Hash)
+}
