@@ -65,7 +65,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
   village_id = village_id ? Number(village_id) : null
   gender = gender ? gender.toUpperCase() : null
   status = status ? status.toUpperCase() : null
-  search = search ? covertEnNumberToBn(search.trim()) : null
+  search = search ? covertEnNumberToBn(search) : null
 
   let filterQuery = {}
 
