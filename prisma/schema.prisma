@@ -82,7 +82,9 @@ model users {
   created_at    DateTime     @default(now())
   updated_at    DateTime?    @updatedAt
 
+  @@index([status], type: Hash)
   @@index([gender], type: Hash)
+  @@index([nid])
 }
 
 model upozillas {
