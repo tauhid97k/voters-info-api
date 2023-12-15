@@ -25,7 +25,7 @@ const paginateWithAreaFields = [
 ]
 
 const paginateWithSorting = (options) => {
-  const page = Number(options.page || 1)
+  const page = Number(options.page <= 0 ? 1 : options.page || 1)
   const take = Number(options.limit || 15)
   const skip = (page - 1) * take
   const sortBy = options.sortBy || 'id'

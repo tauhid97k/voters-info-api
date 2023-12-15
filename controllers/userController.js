@@ -65,7 +65,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
   village_id = village_id ? Number(village_id) : null
   gender = gender ? gender.toUpperCase() : null
   status = status ? status.toUpperCase() : null
-  search = search ? covertEnNumberToBn(search) : null
+  search = search ? covertEnNumberToBn(search.trim()) : null
 
   let filterQuery = {}
 
@@ -102,6 +102,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
           filterQuery ? { ...filterQuery } : {},
           gender ? { gender } : {},
           status ? { status } : {},
+          search ? { nid: { contains: search } } : {},
         ],
       },
     }),
@@ -117,4 +118,25 @@ const getUsers = asyncHandler(async (req, res, next) => {
   })
 })
 
-module.exports = { createUsers, getUsers }
+/*
+  @route    GET: /users/:id
+  @access   public
+  @desc     Get single user
+*/
+const getUser = asyncHandler(async (req, res, next) => {
+  const id = Number(req.params.id)
+  const findUser = await prisma.users.findUnique({
+    where: {
+      id,
+    },
+  })
+
+  if (!findUser)
+    return res.status(404).json({
+      message: 'No user found',
+    })
+
+  res.json(findUser)
+})
+
+module.exports = { createUsers, getUsers, getUser }
