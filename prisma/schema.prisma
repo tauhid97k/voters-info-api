@@ -73,7 +73,7 @@ model users {
   mother        String
   occupation    String
   date_of_birth String
-  mobile_no     String
+  mobile_no     String?
   upozilla_id   Int
   union_id      Int
   village_id    Int
