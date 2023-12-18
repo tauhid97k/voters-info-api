@@ -82,7 +82,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
     filterQuery.village_id = village_id
   }
 
-  const [users, total] = await prisma.$transaction([
+  const [users, totalUsers] = await prisma.$transaction([
     prisma.users.findMany({
       where: {
         AND: [
@@ -96,7 +96,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
       skip,
       orderBy,
     }),
-    prisma.users.count({
+    prisma.users.findMany({
       where: {
         AND: [
           filterQuery ? { ...filterQuery } : {},
@@ -108,12 +108,44 @@ const getUsers = asyncHandler(async (req, res, next) => {
     }),
   ])
 
+  if (!users.length || !totalUsers.length) {
+    return res.json({
+      message: 'No data found',
+    })
+  }
+
+  // Status values
+  const statusValues = ['RED', 'GREEN', 'YELLOW', 'WHITE']
+
+  // Status counts and percentages
+  const { statusCounts, statusPercentages } = statusValues.reduce(
+    (result, status) => {
+      // Count for each status
+      result.statusCounts[status] = totalUsers.reduce(
+        (sum, user) => (user.status === status ? sum + 1 : sum),
+        0
+      )
+
+      // Percentage for each status
+      result.statusPercentages[status] = Math.trunc(
+        (result.statusCounts[status] / totalUsers.length) * 100
+      )
+
+      return result
+    },
+    { statusCounts: {}, statusPercentages: {} }
+  )
+
   return res.json({
     data: users,
+    stats: {
+      statusCounts,
+      statusPercentages,
+    },
     meta: {
       page,
       limit: take,
-      total,
+      total: totalUsers.length,
     },
   })
 })
