@@ -7,6 +7,7 @@ const {
 } = require('../utils/transformData')
 const covertEnNumberToBn = require('../utils/covertEnNumberToBn')
 const { users } = require('../data/data')
+const { userStatusValidator } = require('../validators/userValidator')
 
 /*
   @route    POST: /users
@@ -171,4 +172,49 @@ const getUser = asyncHandler(async (req, res, next) => {
   res.json(findUser)
 })
 
-module.exports = { createUsers, getUsers, getUser }
+/*
+  @route    GET: /users/:id/status
+  @access   private
+  @desc     Update user status
+*/
+const updateUserStatus = asyncHandler(async (req, res, next) => {
+  const { status } = await userStatusValidator.validate(req.body, {
+    abortEarly: false,
+  })
+
+  const selectedQueries = selectQueries(req.params, ['id'])
+  const { id } = selectedQueries
+
+  if (!id)
+    return res.status(400).json({
+      message: 'User id is required',
+    })
+
+  await prisma.$transaction(async (tx) => {
+    const findUser = await tx.users.findUnique({
+      where: {
+        id: Number(id),
+      },
+    })
+
+    if (!findUser)
+      return res.status(404).json({
+        message: 'No user found',
+      })
+
+    await tx.users.update({
+      where: {
+        id: findUser.id,
+      },
+      data: {
+        status,
+      },
+    })
+
+    res.json({
+      message: 'Status updated',
+    })
+  })
+})
+
+module.exports = { createUsers, getUsers, getUser, updateUserStatus }
